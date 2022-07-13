@@ -6,19 +6,24 @@ import { MdDelete } from 'react-icons/md';
 import axios from 'axios';
 
 import useAuthStore from '../store/authStore';
+import { BASE_URL } from '../utils';
 import { client } from '../utils/client';
 import { topics } from '../utils/constants';
-import {BASE_URL} from '../utils/';
 
-const upload = () => {
+const Upload = () => {
   const [caption, setCaption] = useState('');
   const [topic, setTopic] = useState<String>(topics[0].name);
   const [loading, setLoading] = useState<Boolean>(false);
   const [savingPost, setSavingPost] = useState<Boolean>(false);
   const [videoAsset, setVideoAsset] = useState<SanityAssetDocument | undefined>();
   const [wrongFileType, setWrongFileType] = useState<Boolean>(false);
+
   const userProfile: any = useAuthStore((state) => state.userProfile);
   const router = useRouter();
+
+  useEffect(() => {
+    if (!userProfile) router.push('/');
+  }, [userProfile, router]);
 
   const uploadVideo = async (e: any) => {
     const selectedFile = e.target.files[0];
@@ -67,15 +72,18 @@ const upload = () => {
       };
 
       await axios.post(`${BASE_URL}/api/post`, doc);
+        
       router.push('/');
     }
   };
+
   const handleDiscard = () => {
     setSavingPost(false);
     setVideoAsset(undefined);
     setCaption('');
     setTopic('');
   };
+
   return (
     <div className='flex w-full h-full absolute left-0 top-[60px] lg:top-[70px] mb-10 pt-10 lg:pt-20 bg-[#F8F8F8] justify-center'>
       <div className=' bg-white rounded-lg xl:h-[80vh] flex gap-6 flex-wrap justify-center items-center p-14 pt-6'>
@@ -196,6 +204,6 @@ const upload = () => {
       </div>
     </div>
   );
-}
+};
 
-export default upload
+export default Upload;
